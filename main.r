@@ -70,65 +70,6 @@ fresults <-
              res
            }, mc.cores = 5)
 
-fresults <-
-  lapply(1:5,
-           function(i) {
-             
-             nfolds <- 10
-             folds <- createFolds(y = has_episode, 
-                                  k = nfolds, 
-                                  list = FALSE)
-             
-             res <-
-               lapply(1:nfolds,
-                      function(i) {
-                        cat(i, "\n")
-                        
-                        tr_folds <- which(!(1:nfolds %in% i))
-                        smpI <- sample(tr_folds, 1)
-                        vl_folds <- tr_folds[tr_folds %in% smpI]
-                        tr_folds <- tr_folds[!tr_folds %in% smpI]
-                        
-                        tr <- mimic[folds %in% tr_folds]
-                        vl <- mimic[folds %in% vl_folds]
-                        ts <- mimic[folds %in% i]
-                        
-                        tr <- split_episodes_in_database(tr, target ~.)
-                        vl <- split_episodes_in_database(vl, target ~.)
-                        ts <- split_episodes_in_database(ts, target ~.)
-                        
-                        LL_workflow(
-                          form = target ~.,
-                          tr_eps = tr,
-                          vl_eps = vl,
-                          ts_eps = ts,
-                          balance = TRUE,
-                          classifier = "xgb"
-                        )
-                        
-                        
-                        # tr <- mimic[1:20]
-                        # vl <- mimic[21:25]
-                        # ts <- mimic[25:30]
-                        # 
-                        # tr <- split_episodes_in_database(tr, target ~.)
-                        # vl <- split_episodes_in_database(vl, target ~.)
-                        # ts <- split_episodes_in_database(ts, target ~.)
-                        # 
-                        # a<-LL_workflow(
-                        #   form = target ~.,
-                        #   tr_eps = tr,
-                        #   vl_eps = vl,
-                        #   ts_eps = ts,
-                        #   balance = TRUE,
-                        #   classifier = "xgb"
-                        # )
-                        
-                      })
-             res
-           })
-
-
 fresults <- unlist(fresults, recursive = FALSE)
 fresults_analysis <- wrapEval(fresults, 60)
 
